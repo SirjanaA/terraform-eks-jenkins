@@ -1,18 +1,16 @@
 pipeline {
     agent any
+    parameters {
+        choice(name: 'ACTION', choices: ['apply', 'destroy'], description: 'Choose action')
+    }
+
     environment {
         AWS_ACCESS_KEY_ID = credentials('AWS_ACCESS_KEY_ID')
         AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
         AWS_DEFAULT_REGION = 'us-east-1'
+        TF_ACTION = params.ACTION // Assign the parameter value to TF_ACTION
     }
-    stages{
-        stage('Checkout SCM'){
-            steps{
-                script{
-                    checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/SirjanaA/terraform-eks-jenkins.git']])
-                }
-            }
-        }
+    stages
         stage('Initializing Terraform'){
             steps{
                 script{

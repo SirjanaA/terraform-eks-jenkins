@@ -9,6 +9,7 @@ This repository utilises Terraform, EKS and Jenkins.
     - Region: us-east-1
     - Existing keypair and security group were used. 
     - Existing access key and secrets key used from eruser102.
+    - Existing Github access token in Jenkins.
 
 - Remote SSH into VScode and all the files were uploaded in Github repo https://github.com/SirjanaA/terraform-eks-jenkins.git 
 - 2 branches in the repo and changes are first pushed to 'dev' branch then merged to 'main' branch.
@@ -33,6 +34,19 @@ This repository utilises Terraform, EKS and Jenkins.
 ## EKS cluster using Jenkins
 - Login to Jenkins accounts, AWS credentials already configured in the Jenkins Global credentials as secret text.
 - Create new item using pipeline save then configure.
+
+### First test
 - Firstly, pipeline script I used just the environemt variable and first stage to checkout SCM - source code management. 
-- Create an item using pipeline and source via github url: https://github.com/SirjanaA/terraform-eks-jenkins.git
-- Branch */dev 
+- Create an item using pipeline then save to configure, selected just using pipeline.
+- Opened pipeline syntax in new window then selected 'checkout: check out from version control under sample steps.
+- SCM -> Git then url: https://github.com/SirjanaA/terraform-eks-jenkins.git
+- Credentials as none as its a public repo.
+- Branch */dev and everything as default and generated pipeline script: 
+    "stages {
+        stage('Checkout SCM') {
+            steps {
+                checkout scmGit(branches: [[name: '*/dev']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/SirjanaA/terraform-eks-jenkins.git']])
+            }
+        }
+    }"
+

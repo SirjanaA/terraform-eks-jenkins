@@ -1,53 +1,65 @@
 pipeline {
     agent any
+
     parameters {
-        choice(name: 'ACTION', choices: ['apply', 'destroy'], description: 'Choose action')
+        choice(name: 'ACTION', choices: ['apply', 'destroy'], description: 'Choose Terraform action')
     }
+
     environment {
-        AWS_ACCESS_KEY_ID = credentials('AWS_ACCESS_KEY_ID')
-        AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
-        AWS_DEFAULT_REGION = 'us-east-1'
-        TF_ACTION = params.ACTION // Assign the parameter value to TF_ACTION
+        AWS_ACCESS_KEY_ID     = credentials('AWS_ACCESS_KEY_ID')      
+        AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY') 
+        AWS_DEFAULT_REGION    = 'us-east-1'
     }
+
     stages {
         stage('Checkout SCM') {
             steps {
-                checkout scmGit(branches: [[name: '*/dev']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/SirjanaA/terraform-eks-jenkins.git']])
+                git branch: 'dev', url: 'https://github.com/SirjanaA/terraform-eks-jenkins.git'
             }
         }
-        stage('Initializing Terraform') {
+
+        stage('Initialize Terraform') {
             steps {
                 dir('terraform') {
                     sh 'terraform init'
                 }
             }
         }
-        stage('Validating Terraform') {
+
+        stage('Validate Terraform') {
             steps {
                 dir('terraform') {
                     sh 'terraform validate'
                 }
             }
         }
-        stage('Previewing the infrastructure') {
+
+        stage('Plan Infrastructure') {
             steps {
                 dir('terraform') {
-                    sh 'terraform plan -out=tfplan' // Save the plan
+                    script {
+                        if (params.ACTION == 'apply') {
+                            sh 'terraform plan -out=tfplan'
+                        } else {
+                            sh 'terraform plan -destroy -out=tfplan'
+                        }
+                    }
                 }
-                input(message: "Approve?", ok: "proceed")
+                input(message: "Do you want to proceed with ${params.ACTION}?", ok: "Proceed")
             }
         }
-        stage('Applying Terraform or Destroying Infrastructure') { // Clearer stage name
+
+        stage('Apply or Destroy Infrastructure') {
             steps {
                 dir('terraform') {
-                    sh "terraform ${params.ACTION} tfplan" // Use saved plan and parameter
+                    sh 'terraform apply -auto-approve tfplan'
                 }
             }
         }
     }
+
     post {
         always {
-            // Clean up the tfplan file (optional)
             cleanWs()
         }
     }

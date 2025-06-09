@@ -10,8 +10,21 @@ pipeline {
     stages {
         stage('Checkout SCM') {
             steps {
-                git branch: 'dev', url: 'https://github.com/SirjanaA/terraform-eks-jenkins.git'
+                git branch: 'staging', url: 'https://github.com/SirjanaA/terraform-eks-jenkins.git'
             }
         }
-    }   
+
+        stage('Verify AWS connection') {
+            steps {
+                sh 'aws sts get-caller-identity'
+            }
+
+        }
+    }
+
+    post {
+        always {
+            cleanWs()
+        }
+    }  
 }    

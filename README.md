@@ -12,11 +12,21 @@ This repository utilises Terraform, EKS and Jenkins.
     - Existing Github access token in Jenkins.
 
 - Remote SSH into VScode and all the files were uploaded in Github repo https://github.com/SirjanaA/terraform-eks-jenkins.git 
-- 2 branches in the repo and changes are first pushed to 'dev' branch then merged to 'main' branch.
+- 3 branches in the repo: main, dev and staging.
+- Staging branch is for testing and practicing groovy scripts for Jenkins before adding to dev. 
+- Changes are updated in 'dev' branch then merged to 'main' branch.
+
+## Git commands
+- git checkout -b <branch name> (new branch)
+- git add .
+- git status
+- git commit -m "your message for change"
+- git push --set-upstream origin staging
+- or git push for an existing branch
 
 ## Prerequisites
-* Necessary installation are listed under installer.sh file 
-* For this capstone I just instanlled it manually after creating the EC2 instance. It can be easily run by adding the script in user data when creating the instance.
+* Necessary installation are listed under installer.sh file.
+* For this capstone I just installed it manually after creating the EC2 instance. It can be easily run by adding the script in user data when creating the instance.
 * Same Jenkins account is used to run Jenkinsfile from this url: https://github.com/SirjanaA/Jenkins-cap.git
 
 ## IAC
@@ -36,6 +46,8 @@ This repository utilises Terraform, EKS and Jenkins.
 - Create new item using pipeline save then configure.
 
 ### First test
+
+- Check done in staging 
 - Firstly, pipeline script I used just the environemt variable and first stage to checkout SCM - source code management. 
 - Create an item using pipeline then save to configure, selected just using pipeline.
 - Opened pipeline syntax in new window then selected 'checkout: check out from version control under sample steps.
@@ -49,4 +61,5 @@ This repository utilises Terraform, EKS and Jenkins.
             }
         }
     }"
+- Build failed
 

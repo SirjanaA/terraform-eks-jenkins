@@ -15,6 +15,12 @@ module "eks" {
     vpc-cni = {
       most_recent = true
     }
+    aws-ebs-csi-driver = {
+      most_recent = true
+    }
+    amazon-cloudwatch-observability = {
+      most_recent = true
+    }
   }
 
   vpc_id                   = module.vpc.vpc_id
@@ -31,11 +37,11 @@ module "eks" {
 
   eks_managed_node_groups = {
     jen-cluster-wg = {
-      min_size     = 1
-      max_size     = 2
-      desired_size = 1
+      min_size     = 2
+      max_size     = 4
+      desired_size = 3
 
-      instance_types = ["t2.medium"]
+      instance_types = ["t3.medium"]
       capacity_type  = "SPOT"
 
       tags = {

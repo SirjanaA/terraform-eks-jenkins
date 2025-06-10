@@ -13,7 +13,7 @@ This repository demonstrates the deployment of an EKS cluster using Terraform an
     - Both servers have IAM role attached.  
 
 * Code is managed in a GitHub repository: https://github.com/SirjanaA/terraform-eks-jenkins.git with main, dev, and staging branches. The staging branch is primarily used for pipeline testing, while actual development occurs on the dev branch, which is then merged into main.
-
+* All changes are currently in the 'dev' branch. If the pipeline needs to be run from 'main,' please switch to the 'main' branch before execution.
 
 ## Prerequisites
 * The 'installer.sh' file lists the necessary installations. For this project, these were installed manually after EC2 instance creation. This script could be incorporated into the instance's user data for automated installation.

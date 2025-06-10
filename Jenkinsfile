@@ -5,10 +5,6 @@ pipeline {
         AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
         AWS_DEFAULT_REGION = 'us-east-1'
     }
-    parameters {
-        choice(name: 'ACTION', choices: ['apply', 'destroy'], description: 'Choose Terraform action')
-    }
-
     stages {
         stage('Checkout SCM') {
             steps {
@@ -29,26 +25,23 @@ pipeline {
                 }
             }
         }
-        stage('Plan Infrastructure') {
-            steps {
-                dir('terraform') {
-                    sh "terraform plan -out=tfplan ${params.ACTION == 'destroy' ? '-destroy' : ''}"
+         stage('Previewing the infrastructure'){
+            steps{
+                script{
+                    dir('terraform'){
+                         sh 'terraform plan'
+                    }
+                    input(message: "Approve?", ok: "proceed")
                 }
-                input(message: "Do you want to proceed with ${params.ACTION}?", ok: "Proceed") // Input within steps
             }
         }
-
-        stage('Apply or Destroy Infrastructure') {
-            steps {
-                script {  // Script block for conditional logic
-                    dir('terraform') {
-                        if (params.ACTION == 'apply') {
-                            sh 'terraform apply -auto-approve tfplan'
-                        } else {
-                            sh 'terraform destroy -auto-approve tfplan'
-                        }
+        stage('Create/Destroy an EKS cluster'){
+            steps{
+                script{
+                    dir('terraform'){
+                         sh 'terraform $action --auto-approve'
                     }
-                } // End of script block
+                } 
             }
         }
     }

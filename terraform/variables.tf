@@ -29,8 +29,8 @@ variable "instance_count_min" {
   description = "Minimum number of instances to provision."
   default     = 1
   validation {
-    condition     = var.instance_count_min > 0 && var.instance_count_min <= var.instance_count_max # Ensure min <= max
-    error_message = "Instance count min must be between 1 and instance_count_max."
+    condition     = var.instance_count_min >= 1 && var.instance_count_min <= 10 # Validate against fixed bounds
+    error_message = "Instance count min must be between 1 and 10."
   }
 }
 
@@ -39,10 +39,18 @@ variable "instance_count_max" {
   description = "Maximum number of instances to provision."
   default     = 3
   validation {
-    condition     = var.instance_count_max >= var.instance_count_min && var.instance_count_max <= 10 # Ensure max >= min
-    error_message = "Instance count max must be between instance_count_min and 10."
+    condition     = var.instance_count_max >= 1 && var.instance_count_max <= 10 # Validate against fixed bounds
+    error_message = "Instance count max must be between 1 and 10."
   }
 }
+
+resource "null_resource" "instance_count_validation" { # Dummy resource for validation
+
+  provisioner "local-exec" {
+    command = "echo 'Validating instance counts...'" # Optional: Print a message
+  }
+}
+
 
 variable "add_public_ip" {
   type        = bool

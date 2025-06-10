@@ -32,30 +32,24 @@ pipeline {
         stage('Plan Infrastructure') {
             steps {
                 dir('terraform') {
+                    if (params.ACTION == 'destroy') {
+                        sh "terraform plan -destroy --out=tfplan"
+                    }
+                    else (
+                        sh "terraform plan -out=tfplan"
+                    )
+                }
+            }
+            input (message: "Do you want to proceed with $(params.ACTION)?", ok: "Proceed")
+        }
+
+        stage('Apply or Destroy Infrastructure') {
+            steps{
+                dir('terraform') {
                     script {
-                        if (params.ACTION == 'destroy') {
-                            sh "terraform plan -destroy -out=tfplan"
-                        } else {
-                            sh "terraform plan -out=tfplan"
-                        }
+                        sh"terraform apply -auto-approve tfplan"
                     }
                 }
-                input(message: "Do you want to proceed with ${params.ACTION}?", ok: "Proceed")
-            }
-        }  
-        stage('Apply or Destroy Infrastructure') {
-          steps {
-             dir('terraform') {
-                script {
-                   sh "terraform apply -auto-approve tfplan"
-                }
             }
         }
     }
-    }
-    post {
-        always {
-            cleanWs()
-        }
-    }
-}

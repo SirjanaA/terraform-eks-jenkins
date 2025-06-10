@@ -37,7 +37,7 @@ variable "instance_count_min" {
 variable "instance_count_max" {
   description = "Number of instances to provision."
   type        = number
-  default     = 2
+  default     = 3
 
   validation {
     condition     = var.instance_count_max > 2 && var.instance_count_max <= 10

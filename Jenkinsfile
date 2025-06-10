@@ -1,46 +1,60 @@
 pipeline {
-    
+    agent any
     environment {
-        AWS_ACCESS_KEY_ID     = credentials('AWS_ACCESS_KEY_ID')
-        AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_KEY_KEY')
+        AWS_ACCESS_KEY_ID = credentials('AWS_ACCESS_KEY_ID')
+        AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
         AWS_DEFAULT_REGION = 'us-east-1'
     }
+    parameters {
+        choice(name: 'ACTION', choices: ['apply', 'destroy'], description: 'Choose Terraform action')
+    }
 
-   pipeline {
-    agent any
-    
     stages {
-        stage ("checkout from GIT") {
+        stage('Checkout SCM') {
             steps {
-                git branch: 'dev', url: 'https://github.com/SirjanaA/terraform-eks-jenkins.git'
-               
+                checkout([$class: 'GitSCM', branches: [[name: 'dev']], userRemoteConfigs: [[url: 'https://github.com/SirjanaA/terraform-eks-jenkins.git']]])
             }
         }
-        stage ("terraform init") {
+        stage('Initialize Terraform') {
             steps {
-                sh 'terraform init'
+                dir('terraform') {
+                    sh 'terraform init'
+                }
             }
         }
-        stage ("terraform fmt") {
+        stage('Validate Terraform') {
             steps {
-                sh 'terraform fmt'
+                dir('terraform') {
+                    sh 'terraform validate'
+                }
             }
         }
-        stage ("terraform validate") {
+        stage('Plan Infrastructure') {
             steps {
-                sh 'terraform validate'
+                dir('terraform') {
+                    sh "terraform plan -out=tfplan ${params.ACTION == 'destroy' ? '-destroy' : ''}"
+                }
+                input(message: "Do you want to proceed with ${params.ACTION}?", ok: "Proceed") // Input within steps
             }
         }
-        stage ("terrafrom plan") {
+
+        stage('Apply or Destroy Infrastructure') {
             steps {
-                sh 'terraform plan'
+                script {  // Script block for conditional logic
+                    dir('terraform') {
+                        if (params.ACTION == 'apply') {
+                            sh 'terraform apply -auto-approve tfplan'
+                        } else {
+                            sh 'terraform destroy -auto-approve tfplan'
+                        }
+                    }
+                } // End of script block
             }
         }
-        stage ("terraform apply") {
-            steps {
-                sh 'terraform apply --auto-approve'
-            }
+    }
+    post {
+        always {
+            cleanWs()
         }
-     }
-   }
+    }
 }

@@ -1,55 +1,46 @@
 pipeline {
-    agent any
+    
     environment {
-        AWS_ACCESS_KEY_ID = credentials('AWS_ACCESS_KEY_ID')
-        AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
+        AWS_ACCESS_KEY_ID     = credentials('AWS_ACCESS_KEY_ID')
+        AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_KEY_KEY')
         AWS_DEFAULT_REGION = 'us-east-1'
     }
-    parameters {
-        choice(name: 'ACTION', choices: ['apply', 'destroy'], description: 'Choose Terraform action')
-    }
 
+   pipeline {
+    agent any
+    
     stages {
-        stage('Checkout SCM') {
+        stage ("checkout from GIT") {
             steps {
-                checkout([$class: 'GitSCM', branches: [[name: 'dev']], userRemoteConfigs: [[url: 'https://github.com/SirjanaA/terraform-eks-jenkins.git']]])
+                git branch: 'dev', url: 'https://github.com/SirjanaA/terraform-eks-jenkins.git'
+               
             }
         }
-        stage('Initialize Terraform') {
+        stage ("terraform init") {
             steps {
-                dir('terraform') {
-                    sh 'terraform init'
-                }
+                sh 'terraform init'
             }
         }
-        stage('Validate Terraform') {
+        stage ("terraform fmt") {
             steps {
-                dir('terraform') {
-                    sh 'terraform validate'
-                }
+                sh 'terraform fmt'
             }
         }
-        stage('Plan Infrastructure') {
+        stage ("terraform validate") {
             steps {
-                dir('terraform') {
-                    if (params.ACTION == 'destroy') {
-                        sh "terraform plan -destroy --out=tfplan"
-                    }
-                    else (
-                        sh "terraform plan -out=tfplan"
-                    )
-                }
-            }
-            input (message: "Do you want to proceed with $(params.ACTION)?", ok: "Proceed")
-        }
-
-        stage('Apply or Destroy Infrastructure') {
-            steps{
-                dir('terraform') {
-                    script {
-                        sh"terraform apply -auto-approve tfplan"
-                    }
-                }
+                sh 'terraform validate'
             }
         }
-    }
+        stage ("terrafrom plan") {
+            steps {
+                sh 'terraform plan '
+            }
+        }
+        stage ("terraform apply") {
+            steps {
+                sh 'terraform apply --auto-approve'
+            }
+        }
+     }
+   }
+}

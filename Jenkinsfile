@@ -12,7 +12,7 @@ pipeline {
     stages {
         stage('Checkout SCM') {
             steps {
-                checkout([$class: 'GitSCM', branches: [[name: '*/dev']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'my-api-key', url: 'https://github.com/SirjanaA/terraform-eks-jenkins.git']]])
+                checkout([$class: 'GitSCM', branches: [[name: 'dev']], userRemoteConfigs: [[url: 'https://github.com/SirjanaA/terraform-eks-jenkins.git']]])
             }
         }
         stage('Initialize Terraform') {

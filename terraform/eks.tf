@@ -30,7 +30,7 @@ module "eks" {
   }
 
   eks_managed_node_groups = {
-    jen-eks-node   = {
+    jen-eks-wg     = {
       min_size     = 1
       max_size     = 3
       desired_size = 2

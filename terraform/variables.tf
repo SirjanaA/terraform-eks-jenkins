@@ -1,57 +1,71 @@
 variable "project" {
-  description = "The name of the current project."
   type        = string
+  description = "The name of the current project."
   default     = "jenkins-project"
 }
 
 variable "region" {
-  type    = string
-  default = "us-east-1"
+  type        = string
+  description = "The AWS region to deploy in." # Added description
+  default     = "us-east-1"
 }
 
 variable "image_id" {
-  description = "The id of the machine image (AMI) to use for the server."
   type        = map(string)
+  description = "The ID of the machine image (AMI) to use for the server, per region."
   default = {
-    us-east-1 = "ami-04d32dab8ea739477"
+    us-east-1 = "ami-04d32dab8ea739477" # Replace with your desired AMI
   }
 }
 
 variable "instance_type" {
-  description = "The size of the VM instances."
   type        = string
+  description = "The size of the VM instances."
   default     = "t2.micro"
 }
 
 variable "instance_count_min" {
-  description = "Number of instances to provision."
   type        = number
+  description = "Minimum number of instances to provision."
   default     = 1
-
   validation {
-    condition     = var.instance_count_min > 0 && var.instance_count_min <= 3
-    error_message = "Instance count min must be between 1 and 3."
+    condition     = var.instance_count_min > 0 && var.instance_count_min <= var.instance_count_max # Ensure min <= max
+    error_message = "Instance count min must be between 1 and instance_count_max."
   }
 }
 
 variable "instance_count_max" {
-  description = "Number of instances to provision."
   type        = number
+  description = "Maximum number of instances to provision."
   default     = 3
-
   validation {
-    condition     = var.instance_count_max > 2 && var.instance_count_max <= 10
-    error_message = "Instance count max must be between 3 and 10."
+    condition     = var.instance_count_max >= var.instance_count_min && var.instance_count_max <= 10 # Ensure max >= min
+    error_message = "Instance count max must be between instance_count_min and 10."
   }
 }
 
 variable "add_public_ip" {
-  type    = bool
-  default = true
+  type        = bool
+  description = "Whether to assign public IPs to instances." # Added description
+  default     = true
 }
 
 variable "vpc_cidr" {
-  type    = string
-  default = "10.10.0.0/16"
+  type        = string
+  description = "The CIDR block for the VPC."
+  default     = "10.10.0.0/16" # Consider aligning with your VPC resource
 }
+
+variable "allowed_http_cidr" {
+  type        = string
+  description = "CIDR block allowed to access HTTP (port 80).  **CHANGE THIS TO YOUR SPECIFIC IP OR RANGE!**"
+  default     = "0.0.0.0/0" # **DANGER: Wide open by default.  RESTRICT THIS!**
+}
+
+variable "allowed_ssh_cidr" {
+  type        = string
+  description = "CIDR block allowed to access SSH (port 22).  **CHANGE THIS TO YOUR SPECIFIC IP OR RANGE!**"
+  default     = "0.0.0.0/0" # **DANGER: Wide open by default.  RESTRICT THIS!**
+}
+
 

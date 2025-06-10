@@ -47,8 +47,7 @@ The Terraform configuration files are located in the terraform-eks-jenkins/terra
 - Log in to Jenkins (AWS credentials are configured as secret text in Jenkins Global credentials).
 - Create a new pipeline project with Github SCM.
 - Configure the pipeline to use the GitHub repository: https://github.com/SirjanaA/terraform-eks-jenkins.git, select branch */dev. and save.
-- Select configure "This projec is parameterised" select choice parameter, name = 'action', choices= 'apply' and 'destroy' and save.
-- Trigger a build with parameter with the desired action ('apply' to create, 'destroy' to delete).
+- Build with parameter will be trigger after the first run, with the desired action ('apply' to create, 'destroy' to delete).
 - Monitor the build progress via the console output. During the 'apply' process, manual confirmation ('proceed') is required.
 - Cluster creation/destruction takes approximately 15-20 minutes.
 - Verify the cluster status in the AWS console.
@@ -59,7 +58,7 @@ After the cluster is created, you can interact with it using kubectl.
 - Update your kubeconfig: aws eks update-kubeconfig --region us-east-1 --name jenkins-cluster
 - View pods: kubectl get pods (initially, no pods should be running)
 
-## Creating a Pod
+## Creating a Pod (incomplete)
 - Deploy an Nginx pod: kubectl run nginx --image=nginx
 - Verify pod creation: kubectl get pods
 

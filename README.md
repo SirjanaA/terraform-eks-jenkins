@@ -8,16 +8,17 @@ This repository demonstrates the deployment of an EKS cluster using Terraform an
     - Instance Type: Ubuntu t2.medium
     - Region: us-east-1
     - Existing keypair and security group were used.
-    - Using Jenkins-capstone instance to connect Jenkins server.
-    - Both servers have port 8080, 22, 443, 80 and 8082 enabled.
-    - Both servers have IAM role attached.  
+    - Installed seperate Jenkins server as the existing server was running very slow/
+    - Server port opened to 8080, 22, 443, 80 and 8082 enabled.
+    - IAM role attached to the instance. 
 
 * Code is managed in a GitHub repository: https://github.com/SirjanaA/terraform-eks-jenkins.git with main, dev, and staging branches. The staging branch is primarily used for pipeline testing, while actual development occurs on the dev branch, which is then merged into main.
 * All changes are currently in the 'dev' branch. If the pipeline needs to be run from 'main,' please switch to the 'main' branch before execution.
+* git fetch --all (command to see all the branchesgit )
 
 ## Prerequisites
 * The 'installer.sh' file lists the necessary installations. For this project, these were installed manually after EC2 instance creation. This script could be incorporated into the instance's user data for automated installation.
-*  Access to the Jenkins server is through the Jenkins-capstone instance. (Admin credentials can be provided)
+*  Access to the Jenkins server is through public ip of kub-jenkins. (Admin credentials can be provided)
 
 
 ## Project Structure and Terraform Configuration
@@ -44,24 +45,24 @@ The Terraform configuration files are located in the terraform-eks-jenkins/terra
 
 ## Using Jenkins
 - Log in to Jenkins (AWS credentials are configured as secret text in Jenkins Global credentials).
-- Ensure the necessary plugins are installed and updated (AWS, Terraform, Git, etc.).
-- Create a new pipeline project.
-- Configure the pipeline to use the GitHub repository: https://github.com/SirjanaA/terraform-eks-jenkins.git, branch */dev.
-- Parameterize the build with an 'action' parameter, offering 'apply' and 'destroy' choices.
-- Trigger a build with the desired action ('apply' to create, 'destroy' to delete).
+- Create a new pipeline project with Github SCM.
+- Configure the pipeline to use the GitHub repository: https://github.com/SirjanaA/terraform-eks-jenkins.git, select branch */dev. and save.
+- Build with parameter will be trigger after the first run, with the desired action ('apply' to create, 'destroy' to delete).
 - Monitor the build progress via the console output. During the 'apply' process, manual confirmation ('proceed') is required.
 - Cluster creation/destruction takes approximately 15-20 minutes.
 - Verify the cluster status in the AWS console.
 
-## Interacting with the EKS cluster
+## Interacting with the EKS cluster (incomplete)
 After the cluster is created, you can interact with it using kubectl.
 
 - Update your kubeconfig: aws eks update-kubeconfig --region us-east-1 --name jenkins-cluster
 - View pods: kubectl get pods (initially, no pods should be running)
 
-## Creating a Pod
+## Creating a Pod (incomplete)
 - Deploy an Nginx pod: kubectl run nginx --image=nginx
 - Verify pod creation: kubectl get pods
 
-## Destroying the infrastructure
+## Destroying the infrastructure (incomplete)
 - Use the Jenkins pipeline with the 'destroy' action to dismantle the EKS cluster and associated resources. This process can take 15-20 minutes.
+- Please manually delete the infrastructure if the destroy fails. 
+

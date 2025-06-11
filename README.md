@@ -52,7 +52,7 @@ The Terraform configuration files are located in the terraform-eks-jenkins/terra
 - Cluster creation/destruction takes approximately 15-20 minutes.
 - Verify the cluster status in the AWS console.
 
-## Interacting with the EKS cluster
+## Interacting with the EKS cluster (incomplete)
 After the cluster is created, you can interact with it using kubectl.
 
 - Update your kubeconfig: aws eks update-kubeconfig --region us-east-1 --name jenkins-cluster
@@ -62,5 +62,7 @@ After the cluster is created, you can interact with it using kubectl.
 - Deploy an Nginx pod: kubectl run nginx --image=nginx
 - Verify pod creation: kubectl get pods
 
-## Destroying the infrastructure
+## Destroying the infrastructure (incomplete)
 - Use the Jenkins pipeline with the 'destroy' action to dismantle the EKS cluster and associated resources. This process can take 15-20 minutes.
+- Please manually delete the infrastructure if the destroy fails. 
+
